@@ -83,6 +83,10 @@ desugaring {
 }
 
 dependencies {
+  // BouncyCastle for APK signing - fixes xmss_SHAKE128 algorithm issues
+  implementation("org.bouncycastle:bcprov-jdk18on:1.77")
+  implementation("org.bouncycastle:bcpkix-jdk18on:1.77")
+
   debugImplementation(libs.common.leakcanary)
 
   // Annotation processors

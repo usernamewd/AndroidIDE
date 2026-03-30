@@ -53,12 +53,12 @@ class SigningConfigPlugin : Plugin<Project> {
 
       // Create and apply the signing config
       extensions.getByType(BaseExtension::class.java).let { extension ->
-        // Keystore credentials
-        val alias = getEnvOrProp(KEY_ALIAS)
-        val storePass = getEnvOrProp(KEY_STORE_PASS)
-        val keyPass = getEnvOrProp(KEY_PASS)
+        // Use environment variables or local keystore defaults
+        val alias = getEnvOrProp(KEY_ALIAS) ?: "androidide"
+        val storePass = getEnvOrProp(KEY_STORE_PASS) ?: "androidide123"
+        val keyPass = getEnvOrProp(KEY_PASS) ?: "androidide123"
 
-        if (alias != null && storePass != null && keyPass != null && signingKey.exists()) {
+        if (signingKey.exists()) {
           val config = extension.signingConfigs.create("common") {
             storeFile = signingKey
             keyAlias = alias
@@ -69,6 +69,7 @@ class SigningConfigPlugin : Plugin<Project> {
           extension.buildTypes.forEach { buildType ->
             buildType.signingConfig = config
           }
+          logger.info("Custom signing configured for all build types")
         } else {
           logger.warn(
             "Signing info not configured. keystoreFile=$signingKey[exists=${signingKey.exists()}]"
