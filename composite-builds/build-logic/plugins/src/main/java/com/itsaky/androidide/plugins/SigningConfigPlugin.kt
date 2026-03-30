@@ -47,7 +47,8 @@ class SigningConfigPlugin : Plugin<Project> {
 
       val signingKey = signingKey.get().asFile
       if (!signingKey.exists()) {
-        logger.warn("Signing key not found. Debug signing will be used.")
+        logger.warn("Signing key not found. Using debug signing.")
+        configureDebugSigning(target)
         return
       }
 
@@ -73,7 +74,17 @@ class SigningConfigPlugin : Plugin<Project> {
           logger.warn(
             "Signing info not configured. keystoreFile=$signingKey[exists=${signingKey.exists()}]"
           )
-          null
+          configureDebugSigning(target)
+        }
+      }
+    }
+  }
+
+  private fun configureDebugSigning(target: Project) {
+    target.extensions.getByType(BaseExtension::class.java).let { extension ->
+      extension.signingConfigs.findByName("debug")?.let { debugConfig ->
+        extension.buildTypes.forEach { buildType ->
+          buildType.signingConfig = debugConfig
         }
       }
     }
